@@ -8,24 +8,22 @@ extern "C" {
 #include "xmltest.h"
 
 #ifdef __gnu_linux__
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include "Daemon.h"
-#define HASH_TEST(STR) printf("%d = hash(%s)\n", hash(STR), STR);
+    #include <unistd.h>
+    #include <fcntl.h>
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include "Daemon.h"
+    #define HASH_TEST(STR) printf("%d = hash(%s)\n", hash(STR), STR);
 
 /*adding single instance for linux 03.07.2015 */
 
 int fdlock;
 static int get_lock(void) ;
 
+
+
 int main(int argc, char *argv[])
 {
-
-
-
 //   init_daemon_main(argc, argv);
    //readConfigFileAndReturnParameter("/home/ilian/ToBeFucked/testconf.txt");
    // printf("%s\n",strip("/home/user/ilian/", '/'));
@@ -53,6 +51,11 @@ int main(int argc, char *argv[])
    freeList(testXml);
    */
 
+    if ( findFileInDir("/tmp/", "/tmp/Sample", strlen("/tmp/Sample"), -1)) {
+        fprintf(stderr,"Error! Only one instance is allowed!\n");
+        exit(1);
+    }
+    /* ELSE */
     LOG_setErr("/home/ilian/err");
     LOG_setNorm("/home/ilian/norm");
     LOG_setOther("/home/ilian/other");
@@ -78,13 +81,17 @@ int main(int argc, char *argv[])
         Utils.writeToFile("Daemon main.cpp failed\n",
                           LOG_getLogName(ERRORR), "w");
 
+        /* TODO - test to free the memory ]
+        while ( *passToDaemonArgc++ ) {
+            free(*passToDaemonArgc);
+        }
+        [*/
         return 1;
     } else {
         Utils.writeToFile("init_daemon_main() started\n",
                           LOG_getLogName(OTHER), "a+");
     }
 
-  //  init_dirWalk(NULL, argc, argv);
 }
 
 
@@ -108,9 +115,9 @@ static int get_lock(void) {
 
 
 #else
-#include "Service.h"
+    #include "Service.h"
 
-int main(int argc, char *argv[]) {
+    int main(int argc, char *argv[]) {
         printf("Not on UNIX OS\n");
         //return mainO(argc, argv);
     }

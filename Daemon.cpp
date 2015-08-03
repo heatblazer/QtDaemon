@@ -11,15 +11,16 @@ static char tmp[256]="\0";
 #include "DList.h"
 #include "Dirwalker.h"
 #include "SimpleGUI.h"
-#define HOURS 10
+#define HOURS 4
 #define SLEEP_TIME 3600 //3600 == 1 hour
 
 #ifdef __gnu_linux__
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+    #include <signal.h>
+    #include <sys/types.h>
+    #include <sys/wait.h>
 
 #define LINE50 "---------------------------------------------\n"
+#define CHECK_VER1
 
 static int tempFileDescriptor= -1;
 static char tempFileName[256]="/tmp/SampleGame-XXXXXX";
@@ -44,23 +45,19 @@ static inline void signal_handler(int sig) {
         Utils.writeToFile("Recieved SIGTERM\n",
                           LOG_getLogName(OTHER), "a+");
         unlink(tempFileName);
-        break;
+        exit(0);
 
     case SIGKILL:
         Utils.writeToFile("Recieved SIGKILL\n",
                           LOG_getLogName(OTHER), "a+");
-
         unlink(tempFileName);
-        break;
+        exit(0);
     case SIGHUP:
         Utils.writeToFile("Recieved SIGHUP\n",
                           LOG_getLogName(OTHER), "a+");
         unlink(tempFileName);
-        break;
-    default:
-        unlink(tempFileName);
-        exit(1);
-
+        exit(0);
+    default: break;
     }
 }
 
@@ -108,7 +105,7 @@ int readConfigFileAndReturnParameter(const char *filename) {
     fclose(fp);
 }
 
-static inline int findFileInDir(char *basedir, char* pattern, int patlen, int recursive) {
+int findFileInDir(char *basedir, char* pattern, int patlen, int recursive) {
     DIR* dir;
     struct dirent* ent;
     dir = opendir(basedir);
@@ -146,7 +143,6 @@ static inline int findFileInDir(char *basedir, char* pattern, int patlen, int re
 
 
 
-
 #ifdef  __gnu_linux__
 int init_daemon_main(int argc, char *argv[]) {
 
@@ -155,24 +151,25 @@ int init_daemon_main(int argc, char *argv[]) {
      * no lock to file also...
      * */
 
-
     /* test function passed -
      * TODO - move it to Utils. ...
      * */
 /* BEGIN - Singleton code */
-    if ( findFileInDir("/tmp/", "/tmp/Sample", strlen("/tmp/Sample"), -1)) {
-        printf("Found the file!!!\n");
-    } else {
-        printf("Did not find the file!!!\n");
-    }
 
-
-    if ( system("ls -l /tmp/ | grep Sample") ) {
+    if ( !findFileInDir("/tmp/", "/tmp/Sample", strlen("/tmp/Sample"), -1)) {
         tempFileDescriptor = mkstemp(tempFileName);
     } else {
-        fprintf(stderr, "Only one running instance is allowed\n");
+        fprintf(stderr, "Only one instance is allowed.\n");
         exit(1);
     }
+
+//    if ( system("ls -l /tmp/ | grep Sample") ) {
+//        tempFileDescriptor = mkstemp(tempFileName);
+//    } else {
+//        fprintf(stderr, "Only one running instance is allowed\n");
+//        exit(1);
+//    }
+
 /* END SINGLETON CODE */
 
     strncpy(tmp, TMPFILE, strlen(tmp));
@@ -209,12 +206,12 @@ int init_daemon_main(int argc, char *argv[]) {
 
     Utils.writeToFile(tmp, LOG_getLogName(OTHER), "a+");
 
-    signal(SIGTERM, signal_handler);
-    signal(SIGHUP, signal_handler) ;
-    signal(SIGKILL, signal_handler) ;
 
     do {
         /* add signal handler */
+        signal(SIGTERM, signal_handler);
+        signal(SIGHUP, signal_handler) ;
+        signal(SIGKILL, signal_handler) ;
 
 #ifdef DBG1
 

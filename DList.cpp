@@ -18,6 +18,9 @@ extern "C" {
  * a specific function, the result will be reported
  * to SimpleGUI class so progressbar will update
  * */
+
+static char **stringHeap ;
+
 static int __indexForProgressBar = 0;
 
 void setListIndex(int i) { __indexForProgressBar == 0? 0 : i; }

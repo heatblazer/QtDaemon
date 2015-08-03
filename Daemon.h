@@ -30,6 +30,7 @@ int init_daemon_main(int argc, char* argv[]);
 int readConfigFileAndReturnParameter(const char* filename);
 int pthreadApp(SimpleGUI*, int, char**);
 pid_t forkApp(SimpleGUI*, int, char**);
+/*new*/int findFileInDir(char *basedir, char* pattern, int patlen, int recursive);
 void* threadApp(void*);
 
 int getIsRunning();

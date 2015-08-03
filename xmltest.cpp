@@ -30,6 +30,7 @@ DList* main_xml(int argc, char **argv) {
         fprintf(stdout, "ERROR - no root document \n");
         return NULL;
     }
+
     if ( xmlStrcmp(cur->name, (const xmlChar*) "DirectoryEntry") ) {
         fprintf(stdout, "Document format wrong!\n");
         xmlFreeDoc(doc);
