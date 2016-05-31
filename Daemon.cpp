@@ -11,7 +11,7 @@ static char tmp[256]="\0";
 #include "DList.h"
 #include "Dirwalker.h"
 #include "SimpleGUI.h"
-#define HOURS 4
+#define HOURS 2
 #define SLEEP_TIME 3600 //3600 == 1 hour
 
 #ifdef __gnu_linux__
